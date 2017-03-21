@@ -34,5 +34,19 @@ namespace Market.API.Providers
 
             context.Validated(identity);
         }
+
+        public override Task MatchEndpoint(OAuthMatchEndpointContext context)
+        {
+            if(context.IsTokenEndpoint && context.Request.Method == "Options")
+            {
+                context.OwinContext.Response.Headers.Add("Access-Control-Allow-Origin", new[] { "*" });
+                context.OwinContext.Response.Headers.Add("Access-Control-Allow-Headers", new[] { "authorization" });
+                context.RequestCompleted();
+
+                return Task.FromResult(0);
+            }
+
+            return base.MatchEndpoint(context);
+        }
     }
 }
