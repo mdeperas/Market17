@@ -11,6 +11,7 @@ class RegisterController {
             this.state.go('free.login');
         },
             (error) => {
+                console.log(error);
                 error = error.data || error;
                 this.errorMessage = error.modelState[""][0];
             });

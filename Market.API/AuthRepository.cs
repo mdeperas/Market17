@@ -33,6 +33,13 @@ namespace Market.API
             return result;
         }
 
+        public IdentityUser FindUser(string userName)
+        {
+            IdentityUser user = _userManager.FindByName(userName);
+
+            return user;
+        }
+
         public async Task<IdentityUser> FindUser(string userName, string password)
         {
             IdentityUser user = await _userManager.FindAsync(userName, password);

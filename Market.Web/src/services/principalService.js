@@ -1,24 +1,43 @@
 export class PrincipalService {
-    constructor() {
+    constructor(TokenService, UserInfoService, $q) {
+        this.TokenService = TokenService;   
+        this.UserInfoService = UserInfoService;
         this.user = {};
         this.isLoggedIn = false;
-        //1st: Does token exist? Is it valid? Get data from API endpoint about user (by token).
-        //2nd: Initialize local variables from above.
-    }
+        this.q = $q;
+        this.tryGetUserInfo().catch(() => {
+            this.isLoggedIn = false;
+        });
+     }
 
-    authenticate(user) {
-        this.isLoggedIn = true;
-        this.user = user;
-
-        console.log('principalService.authenticate');
-        console.log(this.user);
+    authenticate(token) {
+        this.TokenService.addToken(token);
+        return this.tryGetUserInfo();
     }
 
     logout() {
-        this.user = {};
-        this.isLoggedIn = false;
+        if(this.isLoggedIn)
+        {
+            this.user = {};
+            this.isLoggedIn = false;
+            this.TokenService.removeToken();
+        }
+    }
 
-        console.log('principalService.logout');
-        console.log(this.isLoggedIn);
+    tryGetUserInfo() {
+        let deffered = this.q.defer();
+        this.UserInfoService.getUserInfo().then(
+            (response) => {
+                this.user =  response.data || response;
+                this.isLoggedIn = true;
+                deffered.resolve(true);
+            },
+            (errorResponse) => {
+                this.isLoggedIn = false;
+                this.user = {};
+                deffered.reject(false);
+            });
+
+            return deffered.promise;
     }
 }

@@ -1,29 +1,25 @@
+let accessTokenKey = "accessToken";
 export class TokenService {
     constructor() {
-        this.token = {};
-        //remove this.token
     }
 
     addToken(token) {
         let expiresAt = new Date();
-        expiresAt.setSeconds(expiresAt.getSeconds() + token.expires_in);
-        token.expires_in = expiresAt;
+        let expires_in = expiresAt.setSeconds(expiresAt.getSeconds() + token.expires_in);        
 
-        this.token = token;
-        //save in some storage
+        let accessToken = {
+            expires_in: expires_in,
+            access_token: token.access_token
+        };
+
+        sessionStorage.setItem(accessTokenKey, JSON.stringify(accessToken));
     }
 
     removeToken() {
-        this.token = {};
-        //remove it from storage
+        sessionStorage.removeItem(accessTokenKey);
     }
 
     getToken() {
-        return this.token; //from some storage
-    }
-    
-    isValid() {
-        return this.token.access_token && this.token.expires_in > new Date().getTime();
-        //getToken() instead of this.token
+        return JSON.parse(sessionStorage.getItem(accessTokenKey));
     }
 }

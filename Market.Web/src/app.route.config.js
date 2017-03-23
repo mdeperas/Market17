@@ -1,14 +1,11 @@
 export default function transition($transitions) {
-      $transitions.onBefore({to: 'restricted.*'}, (transition) => {
-          let principalService = transition.injector().get('PrincipalService');
-          
-          console.log(principalService.isLoggedIn);
-          if(principalService.isLoggedIn)
-          {
-            console.log('wszedlem');
-              return true;
-          }
+    $transitions.onBefore({ to: 'restricted.*' }, (transition) => {
+        let principalService = transition.injector().get('PrincipalService');
 
-          return transition.router.stateService.target('free.login');
-      })
+        if (!principalService.isLoggedIn) {
+            return principalService.tryGetUserInfo().catch(() => {
+                return transition.router.stateService.target('free.login');
+            });
+        }
+    })
 };

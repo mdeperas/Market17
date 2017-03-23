@@ -6,10 +6,10 @@ export function authInterceptor(TokenService) {
     return {
         request: (config) => {
             config.headers = config.headers || {};
-        
-            if(TokenService.isValid())
+            
+            let token = TokenService.getToken();
+            if(token && token.expires_in && token.expires_in > new Date().getTime())
             {
-                let token = TokenService.getToken();
                 config.headers.Authorization = 'Bearer ' + token.access_token; 
             }
 

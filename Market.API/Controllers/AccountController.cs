@@ -20,6 +20,28 @@ namespace Market.API.Controllers
             _repo = new AuthRepository();
         }
 
+        [Authorize]
+        [Route("")]
+        public IHttpActionResult Get()
+        {
+            var identityUser = User.Identity.GetUserName();
+
+            if (identityUser != null)
+            {
+                string username = _repo.FindUser(identityUser).UserName;
+
+                if (!string.IsNullOrEmpty(username))
+                {
+                    return Ok(new FrontendUserModel()
+                    {
+                        Username = username
+                    });
+                }
+            }
+
+            return NotFound();
+        }
+
         // POST api/Account/Register
         [AllowAnonymous]
         [Route("Register")]
